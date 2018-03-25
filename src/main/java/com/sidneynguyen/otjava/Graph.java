@@ -7,12 +7,14 @@ public class Graph {
 	private KeyGenerator keyGenerator;
 	private Map<String, Node> nodeMap;
 	private Node curr;
+	private Transformer transformer;
 	
-	public Graph(KeyGenerator keyGenerator) {
+	public Graph(KeyGenerator keyGenerator, Transformer transformer) {
 		this.keyGenerator = keyGenerator;
 		nodeMap = new HashMap<String, Node>();
 		curr = new Node(this.keyGenerator.generateKey());
 		nodeMap.put(curr.getKey(), curr);
+		this.transformer = transformer;
 	}
 	
 	public void insertLeft(Operation operation) {
@@ -40,7 +42,7 @@ public class Graph {
 
 		Node working = parentNode;
 		while (working.getLeftChild() != curr) {
-			Pair pair = Transformer.transform(working.getLeftOperation(), working.getRightOperation());
+			Pair pair = transformer.transform(working.getLeftOperation(), working.getRightOperation());
 			Operation leftPrime = pair.getLeftPrime();
 			Operation rightPrime = pair.getRightPrime();
 			Node combined = new Node(keyGenerator.generateKey());
