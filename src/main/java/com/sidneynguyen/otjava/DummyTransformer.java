@@ -4,7 +4,7 @@ public class DummyTransformer extends Transformer {
 
 	@Override
 	Pair transform(Operation leftOperation, Operation rightOperation) {
-		return null;
+		return new Pair(new Operation(), new Operation());
 	}
 
 }
