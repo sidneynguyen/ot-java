@@ -123,7 +123,13 @@ public class Graph {
 			cols.add(col);
 		}
         StringBuffer output = new StringBuffer();
-		for (int i = 0; i < cols.get(0).size(); i++) {
+		int maxLen = 0;
+		for (ArrayList<String> list : cols) {
+		    if (list.size() > maxLen) {
+		        maxLen = list.size();
+            }
+        }
+		for (int i = 0; i < maxLen; i++) {
 		    for (int j = 0; j < cols.size(); j++) {
 		        ArrayList<String> col = cols.get(j);
 		        if (col.size() >= i) {
