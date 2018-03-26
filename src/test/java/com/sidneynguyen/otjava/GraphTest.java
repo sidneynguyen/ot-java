@@ -40,9 +40,11 @@ public class GraphTest {
         Composer composer = new DummyComposer();
         KeyGenerator generator = new SimpleKeyGenerator();
         Graph graph = new Graph(generator.generateKey(), transformer, composer, generator);
-        graph.insertRight(generator.generateKey(), "0", null);
         graph.insertLeft(generator.generateKey(), "0", null);
-        graph.applyRight();
-        assertEquals("0\t1\t\n2\t3\t\n", graph.toString());
+		graph.insertRight(generator.generateKey(), "0", null);
+        assertEquals("0\t2\t\n1\t3\t\n", graph.toString());
+
+        graph.insertRight(generator.generateKey(), "2", null);
+        assertEquals("0\t2\t4\t\n1\t3\t5\t\n", graph.toString());
 	}
 }

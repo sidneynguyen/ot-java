@@ -31,113 +31,70 @@ public class Graph {
 	}
 	
 	public void insertLeft(String key, String parentKey, Operation operation) {
-		Node parentNode;
-		if (currLeft.getKey().equals(parentKey)) {
-			parentNode = currLeft;
-		} else if (nodeMap.containsKey(parentKey)) {
-			parentNode = nodeMap.get(parentKey);
-		} else {
-			// TODO
-			return;
-		}
-		
-		if (parentNode.getLeftChild() != null || parentNode.getLeftOperation() != null) {
-			//TODO
-		}
-		
-		Node node = new Node(key);
-		node.setRightParent(parentNode);
-		parentNode.setLeftChild(node);
-		parentNode.setLeftOperation(operation);
-		
-		currLeft = node;
-	}
-	
-	public void insertRight(String key, String parentKey, Operation operation) {
-		Node parentNode;
-		if (currRight.getKey().equals(parentKey)) {
-			parentNode = currRight;
-		} else if (nodeMap.containsKey(parentKey)) {
-			parentNode = nodeMap.get(parentKey);
-		} else {
-			// TODO
-			return;
-		}
-		
-		if (parentNode.getRightChild() != null || parentNode.getRightOperation() != null) {
-			//TODO
-		}
-		
-		Node node = new Node(key);
-		node.setLeftParent(parentNode);
-		parentNode.setRightChild(node);
-		parentNode.setRightOperation(operation);
-
-		currRight = node;
+        if (!nodeMap.containsKey(parentKey)) {
+            throw new RuntimeException("parentKey not found");
+        }
+        Node parentNode = nodeMap.get(parentKey);
+        if (parentNode.getRightChild() != null) {
+            throw new RuntimeException("operation outdated");
+        }
+        Node node = new Node(key);
+        nodeMap.put(key, node);
+        node.setRightParent(parentNode);
+        parentNode.setLeftChild(node);
+        parentNode.setLeftOperation(operation);
 	}
 
-	public Pair applyRight() {
-		List<Operation> rightOperationList = new ArrayList<>();
-		Node rightWorking = oldRight;
-		while (rightWorking != currRight) {
-			rightOperationList.add(rightWorking.getRightOperation());
-			rightWorking = rightWorking.getRightChild();
-		}
-		Operation leftPrime = null;
-		Operation rightPrime = composer.compose(rightOperationList);
-		Node leftWorking = oldRight;
-		List<Operation> leftOperationList = new ArrayList<>();
-		while (leftWorking.getLeftChild() != null) {
-			Pair workingPair = transformer.transform(leftWorking.getLeftOperation(), rightPrime);
-			leftPrime = workingPair.getLeftPrime();
-			rightPrime = workingPair.getRightPrime();
-			leftOperationList.add(leftPrime);
-			
-			Node converged = new Node(keyGenerator.generateKey());
-			converged.setRightParent(rightWorking);
-			rightWorking.setLeftChild(converged);
-			rightWorking.setLeftOperation(leftPrime);
-			
-			leftWorking = leftWorking.getLeftChild();
-			rightWorking = converged;
-		}
-		oldRight = currRight;
-		
-		Pair resultPair = new Pair(leftPrime, composer.compose(leftOperationList));
-		
-		return resultPair;
+	public Operation insertRight(String key, String parentKey, Operation operation) {
+        if (!nodeMap.containsKey(parentKey)) {
+            throw new RuntimeException("parentKey not found");
+        }
+        Node parentNode = nodeMap.get(parentKey);
+        if (parentNode.getRightChild() != null) {
+            throw new RuntimeException("operation outdated");
+        }
+        Node node = new Node(key);
+        nodeMap.put(key, node);
+        node.setLeftParent(parentNode);
+        parentNode.setRightChild(node);
+        parentNode.setRightOperation(operation);
+
+        Node working = parentNode;
+        while (working.getLeftChild() != null) {
+            Pair pair = transformer.transform(working.getLeftOperation(), working.getRightOperation());
+            Operation leftPrime = pair.getLeftPrime();
+            Operation rightPrime = pair.getRightPrime();
+
+            Node converged = new Node(keyGenerator.generateKey());
+            nodeMap.put(converged.getKey(), converged);
+
+            Node left = working.getLeftChild();
+            Node right = working.getRightChild();
+            left.setRightChild(converged);
+            left.setRightOperation(rightPrime);
+            right.setLeftChild(converged);
+            right.setLeftOperation(leftPrime);
+            converged.setLeftParent(left);
+            converged.setRightParent(right);
+
+            working = left;
+        }
+        return working.getRightOperation();
 	}
-	
+
 	@Override
 	public String toString() {
-		ArrayList<ArrayList<String>> cols = new ArrayList<>();
-		Node right = rootNode;
-		while (right != null) {
-		    ArrayList<String> col = new ArrayList<>();
-			Node left = right;
-			while (left != null) {
-			    col.add(left.getKey());
-				left = left.getLeftChild();
-			}
-			right = right.getRightChild();
-			cols.add(col);
-		}
-        StringBuffer output = new StringBuffer();
-		int maxLen = 0;
-		for (ArrayList<String> list : cols) {
-		    if (list.size() > maxLen) {
-		        maxLen = list.size();
+	    StringBuffer output = new StringBuffer();
+	    Node row = rootNode;
+        while (row != null) {
+            Node col = row;
+            while (col != null) {
+                output.append(col.getKey()).append('\t');
+                col = col.getRightChild();
             }
-        }
-		for (int i = 0; i < maxLen; i++) {
-		    for (int j = 0; j < cols.size(); j++) {
-		        ArrayList<String> col = cols.get(j);
-		        if (col.size() >= i) {
-		            output.append(col.get(i)).append('\t');
-                }
-            }
+            row = row.getLeftChild();
             output.append('\n');
         }
-		return output.toString();
+        return output.toString();
 	}
 }
