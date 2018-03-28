@@ -12,5 +12,4 @@ public class SimpleEdit extends Edit {
 	public String getEdit() {
 		return data;
 	}
-
 }

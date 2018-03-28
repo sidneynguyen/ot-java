@@ -1,6 +1,7 @@
 package com.sidneynguyen.otjava;
 
 public class Pair {
+
 	private Operation leftPrime;
 	private Operation rightPrime;
 	
