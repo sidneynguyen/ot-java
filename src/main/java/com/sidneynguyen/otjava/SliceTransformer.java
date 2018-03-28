@@ -34,6 +34,7 @@ public class SliceTransformer extends Transformer {
                 case RETAIN: {
                     switch(rightComp.getType()) {
                         case RETAIN: {
+                            /* (R1,  R1) => (R1, R1) */
                             leftPrime.add(new Component(RETAIN, 1, null));
                             rightPrime.add(new Component(RETAIN, 1, null));
                             leftProceed = true;
@@ -41,12 +42,15 @@ public class SliceTransformer extends Transformer {
                             break;
                         }
                         case INSERT: {
-                            leftPrime.add(new Component(INSERT, 1, new SimpleEdit(String.valueOf(rightComp.getData().getEdit().charAt(0)))));
+                            /* (R1,  I(x)) => (I(x), R1 + cursor stays) */
+                            leftPrime.add(new Component(INSERT, 1,
+                                    new SimpleEdit(String.valueOf(rightComp.getData().getEdit().charAt(0)))));
                             rightPrime.add(new Component(RETAIN, 1, null));
                             rightProceed = true;
                             break;
                         }
                         case DELETE: {
+                            /* (R1,  D1) => (D1, nop) */
                             leftPrime.add(new Component(DELETE, 1, null));
                             leftProceed = true;
                             rightProceed = true;
@@ -58,35 +62,44 @@ public class SliceTransformer extends Transformer {
                 case INSERT: {
                     switch(rightComp.getType()) {
                         case RETAIN: {
+                            /* (I(x), R1) => (R1 + cursor stays, I(x)) */
                             leftPrime.add(new Component(RETAIN, 1, null));
-                            rightPrime.add(new Component(INSERT, 1, new SimpleEdit(String.valueOf(leftComp.getData().getEdit().charAt(0)))));
+                            rightPrime.add(new Component(INSERT, 1,
+                                    new SimpleEdit(String.valueOf(leftComp.getData().getEdit().charAt(0)))));
                             leftProceed = true;
                             break;
                         }
                         case INSERT: {
+                            /* (I(x),  I(y)) => x < y ? (R1I(y), I(x)R1) : (I(y)R1, R1I(x)) */
                             char leftChar = leftComp.getData().getEdit().charAt(1);
                             char rightChar = rightComp.getData().getEdit().charAt(1);
                             if(leftChar < rightChar)
                             {
                                 leftPrime.add(new Component(RETAIN, 1, null));
-                                leftPrime.add(new Component(INSERT, 1, new SimpleEdit(String.valueOf(rightComp.getData().getEdit().charAt(0)))));
-                                rightPrime.add(new Component(INSERT, 1, new SimpleEdit(String.valueOf(leftComp.getData().getEdit().charAt(0)))));
+                                leftPrime.add(new Component(INSERT, 1,
+                                        new SimpleEdit(String.valueOf(rightComp.getData().getEdit().charAt(0)))));
+                                rightPrime.add(new Component(INSERT, 1,
+                                        new SimpleEdit(String.valueOf(leftComp.getData().getEdit().charAt(0)))));
                                 rightPrime.add(new Component(RETAIN, 1, null));
                             }
                             else
                             {
-                                leftPrime.add(new Component(INSERT, 1, new SimpleEdit(String.valueOf(rightComp.getData().getEdit().charAt(0)))));
+                                leftPrime.add(new Component(INSERT, 1,
+                                        new SimpleEdit(String.valueOf(rightComp.getData().getEdit().charAt(0)))));
                                 leftPrime.add(new Component(RETAIN, 1, null));
                                 rightPrime.add(new Component(RETAIN, 1, null));
-                                rightPrime.add(new Component(INSERT, 1, new SimpleEdit(String.valueOf(leftComp.getData().getEdit().charAt(0)))));
+                                rightPrime.add(new Component(INSERT, 1,
+                                        new SimpleEdit(String.valueOf(leftComp.getData().getEdit().charAt(0)))));
                             }
                             leftProceed = true;
                             rightProceed = true;
                             break;
                         }
                         case DELETE: {
+                            /* (I(x), D1) => (R1 + cursor stays, I(x)) */
                             leftPrime.add(new Component(RETAIN, 1, null));
-                            rightPrime.add(new Component(INSERT, 1, new SimpleEdit(String.valueOf(leftComp.getData().getEdit().charAt(0)))));
+                            rightPrime.add(new Component(INSERT, 1,
+                                    new SimpleEdit(String.valueOf(leftComp.getData().getEdit().charAt(0)))));
                             leftProceed = true;
                             break;
                         }
@@ -96,18 +109,22 @@ public class SliceTransformer extends Transformer {
                 case DELETE: {
                     switch(rightComp.getType()) {
                         case RETAIN: {
+                            /* (D(x), R1) => (nop, D(x)) */
                             rightPrime.add(new Component(DELETE, 1, null));
                             leftProceed = true;
                             rightProceed = true;
                             break;
                         }
                         case INSERT: {
+                            /* (D1, I(x)) => (I(x), R1 + cursor stays) */
                             rightPrime.add(new Component(RETAIN, 1, null));
-                            leftPrime.add(new Component(INSERT, 1, new SimpleEdit(String.valueOf(rightComp.getData().getEdit().charAt(0)))));
+                            leftPrime.add(new Component(INSERT, 1,
+                                    new SimpleEdit(String.valueOf(rightComp.getData().getEdit().charAt(0)))));
                             rightProceed = true;
                             break;
                         }
                         case DELETE: {
+                            /* (D1, D1) => (nop, nop) */
                             leftProceed = true;
                             rightProceed = true;
                             break;
@@ -117,6 +134,8 @@ public class SliceTransformer extends Transformer {
                 }
             }
         }
+
+        /* If either of the operations end with insert operations, then flush the inserts into the other */
         while(leftIt.hasNext()) {
             leftComp = (Component) leftIt.next();
             if(leftComp.getType() == INSERT) {
