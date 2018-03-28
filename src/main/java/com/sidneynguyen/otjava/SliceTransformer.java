@@ -118,10 +118,18 @@ public class SliceTransformer extends Transformer {
             }
         }
         while(leftIt.hasNext()) {
-            System.out.println("left: " + ((Component)leftIt.next()).getType().toString());
+            leftComp = (Component) leftIt.next();
+            if(leftComp.getType() == INSERT) {
+                leftPrime.add(new Component(RETAIN, 1, null));
+                rightPrime.add(new Component(INSERT, 1, new SimpleEdit(String.valueOf(leftComp.getData().getEdit().charAt(0)))));
+            }
         }
         while(rightIt.hasNext()) {
-            System.out.println("right: " + ((Component)rightIt.next()).getType().toString());
+            rightComp = (Component) rightIt.next();
+            if(rightComp.getType() == INSERT) {
+                rightPrime.add(new Component(RETAIN, 1, null));
+                leftPrime.add(new Component(INSERT, 1, new SimpleEdit(String.valueOf(rightComp.getData().getEdit().charAt(0)))));
+            }
         }
         return new Pair(new Operation(leftPrime), new Operation(rightPrime));
 	}
