@@ -13,4 +13,8 @@ public class Operation {
 	public Operation() {
 		componentList = new ArrayList<Component>();
 	}
+
+	public List<Component> getComponentList() {
+		return componentList;
+	}
 }
