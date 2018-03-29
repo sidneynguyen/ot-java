@@ -66,7 +66,7 @@ public class Operation implements Iterable<Component> {
             Component.Type currentType = currentComponent.getType();
             String currentData = null;
             if (currentType == INSERT) {
-                currentData = currentComponent.getData().getEdit();
+                currentData = currentComponent.getData();
             }
             for (int i = 0; i < componentLength; i++) {
                 switch (currentType) {
@@ -75,7 +75,7 @@ public class Operation implements Iterable<Component> {
                         break;
                     }
                     case INSERT: {
-                        newList.add(new Component(INSERT, 1, new SimpleEdit(String.valueOf(currentData.charAt(i)))));
+                        newList.add(new Component(INSERT, 1, String.valueOf(currentData.charAt(i))));
                         break;
                     }
                     case DELETE: {
@@ -94,11 +94,11 @@ public class Operation implements Iterable<Component> {
         for (Component component : operation) {
             switch (component.getType()) {
                 case RETAIN:
-                    newDoc.append(document.substring(i, component.getLength()));
+                    newDoc.append(document.substring(i, i + component.getLength()));
                     i += component.getLength();
                     break;
                 case INSERT:
-                    newDoc.append(component.getData().getEdit());
+                    newDoc.append(component.getData());
                     break;
                 case DELETE:
                     i += component.getLength();
