@@ -74,5 +74,15 @@ public class OperationTest {
         op1.add(new Component(DELETE, 4, null));
         String s1 = "abcdefg";
         assertEquals("abcxy", Operation.applyOperation(s1, op1));
+
+        Operation op2 = new Operation();
+        op2.add(new Component(RETAIN, 3, null));
+        op2.add(new Component(INSERT, 2, new SimpleEdit("xy")));
+        op2.add(new Component(DELETE, 4, null));
+        op2.add(new Component(INSERT, 5, new SimpleEdit("ijklm")));
+        op2.add(new Component(DELETE, 1, null));
+        op2.add(new Component(RETAIN, 2, null));
+        String s2 = "abcdefg123";
+        assertEquals("abcxyijklm23", Operation.applyOperation(s2, op2));
     }
 }

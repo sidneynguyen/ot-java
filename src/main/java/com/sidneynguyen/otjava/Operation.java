@@ -94,7 +94,7 @@ public class Operation implements Iterable<Component> {
         for (Component component : operation) {
             switch (component.getType()) {
                 case RETAIN:
-                    newDoc.append(document.substring(i, component.getLength()));
+                    newDoc.append(document.substring(i, i + component.getLength()));
                     i += component.getLength();
                     break;
                 case INSERT:
