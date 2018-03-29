@@ -1,6 +1,7 @@
 package com.sidneynguyen.otjava;
 
 public class Node {
+
 	private String key;
 	private Node leftParent;
 	private Node rightParent;

@@ -8,5 +8,4 @@ public class DummyComposer extends Composer {
 	Operation compose(List<Operation> operationList) {
 		return operationList.get(0);
 	}
-	
 }

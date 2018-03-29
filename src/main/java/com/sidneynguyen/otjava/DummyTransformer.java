@@ -6,5 +6,4 @@ public class DummyTransformer extends Transformer {
 	Pair transform(Operation leftOperation, Operation rightOperation) {
 		return new Pair(new Operation(), new Operation());
 	}
-
 }
