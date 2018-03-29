@@ -33,7 +33,7 @@ public class Operation implements Iterable<Component> {
     }
 
 	public int size() {
-	    return componentList.size();
+        return componentList.size();
     }
 
 	public List<Component> getComponentList() {
@@ -95,7 +95,7 @@ public class Operation implements Iterable<Component> {
 
     public class OperationIterator implements Iterator<Component> {
 
-	    int index;
+        int index;
 
         OperationIterator() {
             index = 0;
