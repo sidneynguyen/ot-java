@@ -88,6 +88,26 @@ public class Operation implements Iterable<Component> {
         return new Operation(newList);
     }
 
+    public static String applyOperation(String document, Operation operation) {
+        int i = 0;
+        StringBuffer newDoc = new StringBuffer();
+        for (Component component : operation) {
+            switch (component.getType()) {
+                case RETAIN:
+                    newDoc.append(document.substring(i, component.getLength()));
+                    i += component.getLength();
+                    break;
+                case INSERT:
+                    newDoc.append(component.getData().getEdit());
+                    break;
+                case DELETE:
+                    i += component.getLength();
+                    break;
+            }
+        }
+        return newDoc.toString();
+    }
+
     @Override
     public Iterator<Component> iterator() {
         return new OperationIterator();

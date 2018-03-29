@@ -11,13 +11,15 @@ public class Graph {
 	private Composer composer;
 	private KeyGenerator keyGenerator;
     private Node rootNode;
-    private Node curr;
+    private Node serverState;
+    private Node localState;
 	
 	public Graph(String rootKey, Transformer transformer, Composer composer, KeyGenerator keyGenerator) {
 		nodeMap = new HashMap<>();
 		rootNode = new Node(rootKey);
         nodeMap.put(rootKey, rootNode);
-        this.curr = rootNode;
+        serverState = rootNode;
+        localState = rootNode;
 		
 		this.transformer = transformer;
 		this.composer = composer;
@@ -26,12 +28,33 @@ public class Graph {
     
     public Operation generateOperation() {
         List<Operation> operationList = new ArrayList<>();
-        Node working = curr;
+        Node working = serverState;
         while (working.getLeftChild() != null) {
             operationList.add(working.getLeftOperation());
             working = working.getLeftChild();
         }
         return composer.compose(operationList);
+    }
+
+    public Operation serverInsert(String key, String parentKey, Operation operation) {
+        if (!nodeMap.containsKey(parentKey)) {
+            throw new RuntimeException("parentKey not found");
+        }
+        Node parentNode = nodeMap.get(parentKey);
+        Node node = new Node(key);
+        if (parentNode.getLeftChild() == null) {
+            parentNode.setLeftChild(node);
+            parentNode.setLeftOperation(operation);
+            node.setRightParent(parentNode);
+            localState = node;
+            return operation;
+        }
+        Operation primeOp = insertRight(key, parentKey, operation);
+        parentNode.setLeftChild(node);
+        parentNode.setLeftOperation(primeOp);
+        node.setRightParent(parentNode);
+        localState = node;
+        return primeOp;
     }
 	
 	public void insertLeft(String key, String parentKey, Operation operation) {
@@ -39,7 +62,7 @@ public class Graph {
             throw new RuntimeException("parentKey not found");
         }
         Node parentNode = nodeMap.get(parentKey);
-        if (parentNode.getRightChild() != null) {
+        if (parentNode.getLeftChild() != null) {
             throw new RuntimeException("operation outdated");
         }
 
@@ -49,6 +72,7 @@ public class Graph {
         node.setRightParent(parentNode);
         parentNode.setLeftChild(node);
         parentNode.setLeftOperation(operation);
+        localState = node;
 	}
 
 	public Operation insertRight(String key, String parentKey, Operation operation) {
@@ -58,7 +82,7 @@ public class Graph {
             while (working.getRightChild() != null) {
                 working = working.getRightChild();
             }
-            curr = working;
+            serverState = working;
             return null;
         }
 
@@ -76,7 +100,7 @@ public class Graph {
         node.setLeftParent(parentNode);
         parentNode.setRightChild(node);
         parentNode.setRightOperation(operation);
-        curr = node;
+        serverState = node;
 
         // generate intermediate nodes
         Node working = parentNode;
@@ -99,8 +123,17 @@ public class Graph {
 
             working = left;
         }
+        localState = working;
         return working.getRightOperation();
-	}
+    }
+    
+    public String getLocalStateKey() {
+        return localState.getKey();
+    }
+
+    public String getServerStateKey() {
+        return serverState.getKey();
+    }
 
 	@Override
 	public String toString() {
