@@ -14,11 +14,11 @@ public class DynamicDifferTest extends TestCase{
         Operation op = dynamicDiffer.diff(old, curr);
         ArrayList<Component> realAns = new ArrayList<Component>();
         realAns.add(new Component(Component.Type.DELETE, 1, null));
-        realAns.add(new Component(Component.Type.INSERT, 1, new SimpleEdit("H")));
+        realAns.add(new Component(Component.Type.INSERT, 1, "H"));
         realAns.add(new Component(Component.Type.RETAIN, 1, null));
         realAns.add(new Component(Component.Type.RETAIN, 1, null));
         realAns.add(new Component(Component.Type.RETAIN, 1, null));
-        realAns.add(new Component(Component.Type.INSERT, 1, new SimpleEdit("l")));
+        realAns.add(new Component(Component.Type.INSERT, 1, "l"));
         realAns.add(new Component(Component.Type.RETAIN, 1, null));
         List<Component> opAns = (List<Component>) op.getComponentList();
         Iterator realAnsIt = realAns.iterator();
@@ -28,7 +28,7 @@ public class DynamicDifferTest extends TestCase{
             Component opComp = ((Component)opAnsIt.next());
             assertEquals(realComp.getType(), opComp.getType());
             if(realComp.getType() == Component.Type.INSERT){
-                assertEquals(realComp.getData().getEdit().charAt(0), opComp.getData().getEdit().charAt(0));
+                assertEquals(realComp.getData().charAt(0), opComp.getData().charAt(0));
             }
 
         }
@@ -45,7 +45,7 @@ public class DynamicDifferTest extends TestCase{
         ArrayList<Component> realAns = new ArrayList<Component>();
         realAns.add(new Component(Component.Type.DELETE, 1, null));
         realAns.add(new Component(Component.Type.DELETE, 1, null));
-        realAns.add(new Component(Component.Type.INSERT, 1, new SimpleEdit("H")));
+        realAns.add(new Component(Component.Type.INSERT, 1, "H"));
         realAns.add(new Component(Component.Type.RETAIN, 1, null));
         realAns.add(new Component(Component.Type.DELETE, 1, null));
         realAns.add(new Component(Component.Type.DELETE, 1, null));
@@ -57,7 +57,7 @@ public class DynamicDifferTest extends TestCase{
             Component opComp = ((Component)opAnsIt.next());
             assertEquals(realComp.getType(), opComp.getType());
             if(realComp.getType() == Component.Type.INSERT){
-                assertEquals(realComp.getData().getEdit().charAt(0), opComp.getData().getEdit().charAt(0));
+                assertEquals(realComp.getData().charAt(0), opComp.getData().charAt(0));
             }
 
         }

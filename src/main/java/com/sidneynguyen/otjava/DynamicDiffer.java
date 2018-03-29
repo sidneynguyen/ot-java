@@ -49,7 +49,7 @@ public class DynamicDiffer extends Differ {
             nextj = j - 1;
             if(nextj >=0 && nextj >= 0 && mat[nexti][nextj] <= mat[i][nextj] && mat[nexti][nextj] <= mat[nexti][j]){
                 if(mat[i][j] - mat[nexti][nextj] == 2){
-                    result.addFirst(new Component(Component.Type.INSERT, 1, new SimpleEdit(String.valueOf(curr.charAt(j - 1)))));
+                    result.addFirst(new Component(Component.Type.INSERT, 1, String.valueOf(curr.charAt(j - 1))));
                     result.addFirst(new Component(Component.Type.DELETE, 1, null));
                 }
                 else {
@@ -59,7 +59,7 @@ public class DynamicDiffer extends Differ {
                 j = nextj;
             }
             else if(nexti < 0 || nextj >= 0 && mat[i][nextj] < mat[nexti][j]) {
-                result.addFirst(new Component(Component.Type.INSERT, 1, new SimpleEdit(String.valueOf(curr.charAt(j - 1)))));
+                result.addFirst(new Component(Component.Type.INSERT, 1, String.valueOf(curr.charAt(j - 1))));
                 i = i;
                 j = nextj;
             }

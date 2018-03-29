@@ -4,9 +4,9 @@ public class Component {
 
 	private Type type;
 	private int length;
-	private Edit data;
+	private String data;
 	
-	public Component(Type type, int length, Edit data) {
+	public Component(Type type, int length, String data) {
 		this.type = type;
 		this.length = length;
 		this.data = data;
@@ -20,7 +20,7 @@ public class Component {
 		return length;
 	}
 	
-	public Edit getData() {
+	public String getData() {
 		return data;
 	}
 
@@ -36,7 +36,7 @@ public class Component {
             return false;
         }
         Component other = (Component) obj;
-        return this.type == other.type && this.length == other.length
-                && (this.type != Type.INSERT || this.data.equals(other.data));
+        return type == other.type && length == other.length
+                && (type != Type.INSERT || data.equals(other.data));
     }
 }

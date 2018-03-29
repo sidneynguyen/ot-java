@@ -17,19 +17,19 @@ public class OperationTest {
     public void equalsTest() {
         Operation op1 = new Operation();
         op1.add(new Component(RETAIN, 3, null));
-        op1.add(new Component(INSERT, 2, new SimpleEdit("ab")));
+        op1.add(new Component(INSERT, 2, "ab"));
         op1.add(new Component(DELETE, 4, null));
         Operation op2 = new Operation();
         op2.add(new Component(RETAIN, 3, null));
-        op2.add(new Component(INSERT, 2, new SimpleEdit("ab")));
+        op2.add(new Component(INSERT, 2, "ab"));
         op2.add(new Component(DELETE, 4, null));
         assertEquals(op1, op2);
 
         Operation op3 = new Operation();
         op3.add(new Component(RETAIN, 2, null));
         op3.add(new Component(RETAIN, 1, null));
-        op3.add(new Component(INSERT, 1, new SimpleEdit("a")));
-        op3.add(new Component(INSERT, 1, new SimpleEdit("b")));
+        op3.add(new Component(INSERT, 1, "a"));
+        op3.add(new Component(INSERT, 1, "b"));
         op3.add(new Component(DELETE, 2, null));
         op3.add(new Component(DELETE, 2, null));
         assertEquals(op1, op3);
@@ -37,14 +37,14 @@ public class OperationTest {
 
         Operation op4 = new Operation();
         op4.add(new Component(RETAIN, 3, null));
-        op4.add(new Component(INSERT, 2, new SimpleEdit("ab")));
+        op4.add(new Component(INSERT, 2, "ab"));
         op4.add(new Component(DELETE, 4, null));
         op4.add(new Component(RETAIN, 1, null));
         assertNotEquals(op1, op4);
 
         Operation op5 = new Operation();
         op5.add(new Component(RETAIN, 3, null));
-        op5.add(new Component(INSERT, 2, new SimpleEdit("ab")));
+        op5.add(new Component(INSERT, 2, "ab"));
         op5.add(new Component(DELETE, 2, null));
         op5.add(new Component(RETAIN, 1, null));
         assertNotEquals(op1, op5);
@@ -54,7 +54,7 @@ public class OperationTest {
     public void iteratorTest() {
         Operation op1 = new Operation();
         Component c1 = new Component(RETAIN, 3, null);
-        Component c2 = new Component(INSERT, 2, new SimpleEdit("ab"));
+        Component c2 = new Component(INSERT, 2, "ab");
         Component c3 = new Component(DELETE, 4, null);
         op1.add(c1);
         op1.add(c2);
@@ -70,16 +70,16 @@ public class OperationTest {
     public void applyOperationTest() {
         Operation op1 = new Operation();
         op1.add(new Component(RETAIN, 3, null));
-        op1.add(new Component(INSERT, 2, new SimpleEdit("xy")));
+        op1.add(new Component(INSERT, 2, "xy"));
         op1.add(new Component(DELETE, 4, null));
         String s1 = "abcdefg";
         assertEquals("abcxy", Operation.applyOperation(s1, op1));
 
         Operation op2 = new Operation();
         op2.add(new Component(RETAIN, 3, null));
-        op2.add(new Component(INSERT, 2, new SimpleEdit("xy")));
+        op2.add(new Component(INSERT, 2, "xy"));
         op2.add(new Component(DELETE, 4, null));
-        op2.add(new Component(INSERT, 5, new SimpleEdit("ijklm")));
+        op2.add(new Component(INSERT, 5, "ijklm"));
         op2.add(new Component(DELETE, 1, null));
         op2.add(new Component(RETAIN, 2, null));
         String s2 = "abcdefg123";
