@@ -6,13 +6,9 @@ import java.util.List;
 public class SliceComposer extends Composer {
 
     public Operation compose(List<Operation> operationList) {
-        if (operationList.size() == 1) {
-            return operationList.get(0);
-        }
-
-        Operation result = new Operation();
-        for (int i = 0; i < operationList.size() - 1; i++) {
-            result.add(subCompose(operationList.get(i), operationList.get(i + 1)));
+        Operation result = operationList.get(0);
+        for (int i = 1; i < operationList.size(); i++) {
+            result = subCompose(result, operationList.get(i));
         }
         return result;
     }

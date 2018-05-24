@@ -16,8 +16,8 @@ public class SliceTransformer extends Transformer {
         Iterator rightIt = slicedRight.getComponentList().iterator();
         Component leftComp = null;
         Component rightComp = null;
-        List<Component> leftPrime = new ArrayList<Component>();
-        List<Component> rightPrime = new ArrayList<Component>();
+        List<Component> leftPrime = new ArrayList<>();
+        List<Component> rightPrime = new ArrayList<>();
         boolean leftProceed = true;
         boolean rightProceed = true;
         while(leftIt.hasNext() && rightIt.hasNext())
@@ -34,7 +34,7 @@ public class SliceTransformer extends Transformer {
                 case RETAIN: {
                     switch(rightComp.getType()) {
                         case RETAIN: {
-                            /* (R1,  R1) => (R1, R1) */
+                            // (R, R) => (R, R) -> (->, ->)
                             leftPrime.add(new Component(RETAIN, 1, null));
                             rightPrime.add(new Component(RETAIN, 1, null));
                             leftProceed = true;
@@ -42,14 +42,14 @@ public class SliceTransformer extends Transformer {
                             break;
                         }
                         case INSERT: {
-                            /* (R1,  I(x)) => (I(x), R1 + cursor stays) */
+                            // (R, I(x)) => (I(x), R) -> (-, ->)
                             leftPrime.add(new Component(INSERT, 1, String.valueOf(rightComp.getData().charAt(0))));
                             rightPrime.add(new Component(RETAIN, 1, null));
                             rightProceed = true;
                             break;
                         }
                         case DELETE: {
-                            /* (R1,  D1) => (D1, nop) */
+                            // (R, D) => (D, nop) -> (->, ->)
                             leftPrime.add(new Component(DELETE, 1, null));
                             leftProceed = true;
                             rightProceed = true;
@@ -61,36 +61,41 @@ public class SliceTransformer extends Transformer {
                 case INSERT: {
                     switch(rightComp.getType()) {
                         case RETAIN: {
-                            /* (I(x), R1) => (R1 + cursor stays, I(x)) */
+                            // (I(x), R) => (R, I(x)) -> (->, -)
                             leftPrime.add(new Component(RETAIN, 1, null));
                             rightPrime.add(new Component(INSERT, 1, String.valueOf(leftComp.getData().charAt(0))));
                             leftProceed = true;
                             break;
                         }
                         case INSERT: {
-                            /* (I(x),  I(y)) => x < y ? (R1I(y), I(x)R1) : (I(y)R1, R1I(x)) */
-                            char leftChar = leftComp.getData().charAt(1);
-                            char rightChar = rightComp.getData().charAt(1);
+                            char leftChar = leftComp.getData().charAt(0);
+                            char rightChar = rightComp.getData().charAt(0);
                             if(leftChar < rightChar)
                             {
+                                // (I(a), I(b)) => (R, I(a)) -> (->, -)
                                 leftPrime.add(new Component(RETAIN, 1, null));
-                                leftPrime.add(new Component(INSERT, 1, String.valueOf(rightComp.getData().charAt(0))));
-                                rightPrime.add(new Component(INSERT, 1, String.valueOf(leftComp.getData().charAt(0))));
-                                rightPrime.add(new Component(RETAIN, 1, null));
+                                rightPrime.add(new Component(INSERT, 1, leftComp.getData().substring(0, 1)));
+                                leftProceed = true;
+                                if (!leftIt.hasNext() || !rightIt.hasNext()) {
+                                    leftPrime.add(new Component(INSERT, 1, rightComp.getData().substring(0, 1)));
+                                    rightPrime.add(new Component(RETAIN, 1, null));
+                                }
                             }
                             else
                             {
-                                leftPrime.add(new Component(INSERT, 1, String.valueOf(rightComp.getData().charAt(0))));
-                                leftPrime.add(new Component(RETAIN, 1, null));
+                                // (I(b), I(a)) => (I(a), R) -> (-, ->)
+                                leftPrime.add(new Component(INSERT, 1, rightComp.getData().substring(0, 1)));
                                 rightPrime.add(new Component(RETAIN, 1, null));
-                                rightPrime.add(new Component(INSERT, 1, String.valueOf(leftComp.getData().charAt(0))));
+                                rightProceed = true;
+                                if (!leftIt.hasNext() || !rightIt.hasNext()) {
+                                    leftPrime.add(new Component(RETAIN, 1, null));
+                                    rightPrime.add(new Component(INSERT, 1, leftComp.getData().substring(0, 1)));
+                                }
                             }
-                            leftProceed = true;
-                            rightProceed = true;
                             break;
                         }
                         case DELETE: {
-                            /* (I(x), D1) => (R1 + cursor stays, I(x)) */
+                            // (I(x), D) => (R, I(x)) -> (->, -)
                             leftPrime.add(new Component(RETAIN, 1, null));
                             rightPrime.add(new Component(INSERT, 1, String.valueOf(leftComp.getData().charAt(0))));
                             leftProceed = true;
@@ -102,21 +107,21 @@ public class SliceTransformer extends Transformer {
                 case DELETE: {
                     switch(rightComp.getType()) {
                         case RETAIN: {
-                            /* (D(x), R1) => (nop, D(x)) */
+                            // (D, R) => (nop, D) -> (->, ->)
                             rightPrime.add(new Component(DELETE, 1, null));
                             leftProceed = true;
                             rightProceed = true;
                             break;
                         }
                         case INSERT: {
-                            /* (D1, I(x)) => (I(x), R1 + cursor stays) */
-                            rightPrime.add(new Component(RETAIN, 1, null));
+                            // (D, I(x)) => (I(x), R) -> (-, ->)
                             leftPrime.add(new Component(INSERT, 1, String.valueOf(rightComp.getData().charAt(0))));
+                            rightPrime.add(new Component(RETAIN, 1, null));
                             rightProceed = true;
                             break;
                         }
                         case DELETE: {
-                            /* (D1, D1) => (nop, nop) */
+                            // (D, D) => (nop, nop) -> (->, ->)
                             leftProceed = true;
                             rightProceed = true;
                             break;

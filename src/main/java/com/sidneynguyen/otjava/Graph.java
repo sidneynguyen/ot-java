@@ -42,6 +42,7 @@ public class Graph {
         }
         Node parentNode = nodeMap.get(parentKey);
         Node node = new Node(key);
+        nodeMap.put(key, node);
         if (parentNode.getLeftChild() == null) {
             parentNode.setLeftChild(node);
             parentNode.setLeftOperation(operation);
@@ -54,6 +55,7 @@ public class Graph {
         parentNode.setLeftOperation(primeOp);
         node.setRightParent(parentNode);
         localState = node;
+
         return primeOp;
     }
 	
@@ -115,9 +117,9 @@ public class Graph {
             Node left = working.getLeftChild();
             Node right = working.getRightChild();
             left.setRightChild(converged);
-            left.setRightOperation(rightPrime);
+            left.setRightOperation(leftPrime);
             right.setLeftChild(converged);
-            right.setLeftOperation(leftPrime);
+            right.setLeftOperation(rightPrime);
             converged.setLeftParent(left);
             converged.setRightParent(right);
 

@@ -36,6 +36,10 @@ public class Server {
         document = Operation.applyOperation(document, operation);
     }
 
+    public Message sendOp() {
+        return sendQueue.remove();
+    }
+
     public String getDocument() {
         return document;
     }
