@@ -35,18 +35,28 @@ public class Client {
     }
 
     public Message sendOp() {
+        if (sendQueue.isEmpty()) {
+            return null;
+        }
         return sendQueue.remove();
     }
 
     public void applyReceivedOp() {
+        if (receiveQueue.isEmpty()) {
+            return;
+        }
         Message message = receiveQueue.remove();
         Operation operation = graph.insertRight(message.getKey(), message.getParentKey(), message.getOperation());
-        if (operation != null) {
-            document = Operation.applyOperation(document, operation);
+        if (operation == null) {
+            return;
         }
+        document = Operation.applyOperation(document, operation);
     }
 
     public void applyLocalEdits(String edit) {
+        if (edit.equals(document)) {
+            return;
+        }
         Operation operation = differ.diff(document, edit);
         String parentKey = graph.getLocalStateKey();
         graph.insertLeft(keyGenerator.generateKey(), parentKey, operation);

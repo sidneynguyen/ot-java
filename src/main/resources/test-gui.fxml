@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.sidneynguyen.otjava.TestGuiController"
+            prefHeight="400.0" prefWidth="600.0">
+    <children>
+        <TextArea fx:id="client1Text" layoutX="26.0" layoutY="22.0" prefHeight="200.0" prefWidth="200.0" text="Hello" />
+        <TextArea fx:id="client2Text" layoutX="373.0" layoutY="22.0" prefHeight="200.0" prefWidth="200.0" text="Hello" />
+        <Label fx:id="serverLabel" layoutX="284.0" layoutY="276.0" text="Hello" />
+        <Button layoutX="67.0" layoutY="230.0" mnemonicParsing="false" onAction="#handleClient1Push" text="Push" />
+        <Button layoutX="434.0" layoutY="230.0" mnemonicParsing="false" onAction="#handleClient2Push" text="Push" />
+        <Button layoutX="126.0" layoutY="230.0" mnemonicParsing="false" onAction="#handleClient1Pull" text="Pull" />
+        <Button layoutX="498.0" layoutY="230.0" mnemonicParsing="false" onAction="#handleClient2Pull" text="Pull" />
+    </children>
+</AnchorPane>

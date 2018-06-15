@@ -27,6 +27,9 @@ public class Server {
     }
 
     public void applyReceivedOp() {
+        if (receiveQueue.isEmpty()) {
+            return;
+        }
         Message message = receiveQueue.remove();
         String parentKey = graph.getLocalStateKey();
         Operation operation = graph.serverInsert(message.getKey(), message.getParentKey(), message.getOperation());
@@ -37,6 +40,9 @@ public class Server {
     }
 
     public Message sendOp() {
+        if (sendQueue.isEmpty()) {
+            return null;
+        }
         return sendQueue.remove();
     }
 
