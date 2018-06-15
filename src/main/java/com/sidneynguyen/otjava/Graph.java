@@ -41,22 +41,49 @@ public class Graph {
             throw new RuntimeException("parentKey not found");
         }
         Node parentNode = nodeMap.get(parentKey);
-        Node node = new Node(key);
-        nodeMap.put(key, node);
         if (parentNode.getLeftChild() == null) {
+            Node node = new Node(key);
+            nodeMap.put(node.getKey(), node);
             parentNode.setLeftChild(node);
             parentNode.setLeftOperation(operation);
             node.setRightParent(parentNode);
             localState = node;
             return operation;
         }
-        Operation primeOp = insertRight(key, parentKey, operation);
-        parentNode.setLeftChild(node);
-        parentNode.setLeftOperation(primeOp);
-        node.setRightParent(parentNode);
+
+        Node working = parentNode;
+        Node temp = new Node(keyGenerator.generateKey());
+        working.setRightChild(temp);
+        working.setRightOperation(operation);
+        temp.setLeftParent(working);
+        while (working.getLeftChild() != null) {
+            Pair pair = transformer.transform(working.getLeftOperation(), working.getRightOperation());
+            Operation leftPrime = pair.getLeftPrime();
+            Operation rightPrime = pair.getRightPrime();
+
+            Node converged = new Node(keyGenerator.generateKey());
+
+            Node left = working.getLeftChild();
+            Node right = working.getRightChild();
+
+            left.setRightChild(converged);
+            left.setRightOperation(leftPrime);
+            converged.setLeftParent(left);
+
+            right.setLeftChild(converged);
+            right.setLeftOperation(rightPrime);
+            converged.setRightParent(right);
+
+            working = left;
+        }
+
+        Node node = working.getRightChild();
+        node.setKey(key);
+        nodeMap.put(node.getKey(), node);
+
         localState = node;
 
-        return primeOp;
+        return working.getRightOperation();
     }
 	
 	public void insertLeft(String key, String parentKey, Operation operation) {
@@ -80,10 +107,20 @@ public class Graph {
 	public Operation insertRight(String key, String parentKey, Operation operation) {
         if (nodeMap.containsKey(key)) {
             // update curr
-            Node working = nodeMap.get(key);
+            Node node = nodeMap.get(key);
+            Node working = node;
             while (working.getRightChild() != null) {
                 working = working.getRightChild();
             }
+            nodeMap.remove(key);
+            nodeMap.remove(working.getKey());
+            node.setKey(working.getKey());
+            working.setKey(key);
+            if (localState == node) {
+                localState = working;
+            }
+            nodeMap.put(working.getKey(), working);
+            nodeMap.put(node.getKey(), node);
             serverState = working;
             return null;
         }
@@ -125,7 +162,7 @@ public class Graph {
 
             working = left;
         }
-        localState = working;
+        localState = working.getRightChild();
         return working.getRightOperation();
     }
     
